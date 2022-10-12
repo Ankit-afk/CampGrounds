@@ -1,11 +1,35 @@
 <% layout("layouts/boilerplate") %>
-    <form action="/campgrounds" method="post">
-        <label for="title">Title</label>
-        <input type="text" id="title" name="campground[title]">
-        <label for="location">Location</label>
-        <input type="text" id="location" name="campground[location]">
-        <button>Add Campground</button>
-    </form>
-    <footer>
-        <a href="/campgrounds">Back</a>
-    </footer>
+<div class="row">
+    <h1 class="text-center">New Campground</h1>
+    <div class="col-6 offset-3">
+        <form action="/campgrounds" method="post">
+            <div class="mb-3">
+                <label class="form-label" for="title">Title</label>
+                <input class="form-control" type="text" id="title" name="campground[title]">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="location">Location</label>
+                <input class="form-control" type="text" id="location" name="campground[location]">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="image">Image url</label>
+                <input class="form-control" type="text" id="image" name="campground[image]">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="price">Price</label>
+                <div class="input-group">
+                    <input class="form-control" type="text" id="price" name="campground[price]" placeholder="0.00">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="description">Description</label>
+                <textarea class="form-control" type="text" id="description" name="campground[description]" placeholder="Example: Near the outskirts of the city"></textarea>
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-success">Add Campground</button>
+                <a class="btn btn-danger" href="/campgrounds" role="button">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
