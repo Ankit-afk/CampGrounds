@@ -3,3 +3,7 @@ A yelp inspired app but for hidden gems in your locality. Based on Express as th
 
 ## Index page
 <p align="center"><img src="screenshots/index.png"\></p>
+
+## Campground details
+<p align="center"><img src="screenshots/details.png"\></p>
+
