@@ -9,6 +9,7 @@ const ejsMate = require('ejs-mate')
 const {campgroundSchema} = require('./schemas')
 
 const Campground = require("./models/campground")
+const Review = require('./models/review')
 const wrapAsync = require('./utils/wrapAsync')
 const expressError = require('./utils/expressError')
 const mongoose = require('mongoose');
@@ -80,6 +81,17 @@ app.put('/campgrounds/:id', validateCampground, wrapAsync(async (req, res) =>{
 app.delete('/campgrounds/:id', wrapAsync(async (req,res) =>{
     const campground = await Campground.findByIdAndDelete(req.params.id)
     res.redirect('/campgrounds')
+}))
+
+app.post('/campgrounds/:id/reviews', wrapAsync(async (req,res) =>{
+    const campground = await Campground.findById(req.params.id)
+    console.log(campground)
+    const review = new Review(req.body.review)
+    console.log(review)
+    campground.reviews.push(review)
+    await review.save()
+    await campground.save()
+    res.redirect(`/campgrounds/${campground._id}`)
 }))
 
 app.all("*", (req, res, next) => {
