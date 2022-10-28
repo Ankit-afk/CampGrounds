@@ -74,14 +74,14 @@ app.post('/campgrounds', validateCampground , wrapAsync(async (req, res, next) =
 }))
 
 app.get('/campgrounds/:id', wrapAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id)
+    const campground = await Campground.findById(req.params.id).populate('reviews')
+    // console.log(campground)
     res.render("./campgrounds/show",{campground})
 }))
 
 app.get('/campgrounds/:id/edit', wrapAsync(async (req,res) => {
     const campground = await Campground.findById(req.params.id)
     res.render('./campgrounds/edit',{campground})
-
 }))
 
 app.put('/campgrounds/:id', validateCampground, wrapAsync(async (req, res) =>{
@@ -96,13 +96,20 @@ app.delete('/campgrounds/:id', wrapAsync(async (req,res) =>{
 
 app.post('/campgrounds/:id/reviews', validateReview, wrapAsync(async (req,res) =>{
     const campground = await Campground.findById(req.params.id)
-    console.log(campground)
+    // console.log(campground)
     const review = new Review(req.body.review)
-    console.log(review)
+    // console.log(review)
     campground.reviews.push(review)
     await review.save()
     await campground.save()
     res.redirect(`/campgrounds/${campground._id}`)
+}))
+
+app.delete('/campgrounds/:id/reviews/:reviewID', wrapAsync(async (req,res,next) =>{
+    const {id,reviewID} = req.params
+    await Campground.findByIdAndUpdate(id, {$pull:{reviews: reviewID}})
+    await Review.findByIdAndDelete(reviewID)
+    res.redirect(`/campgrounds/${id}`)
 }))
 
 app.all("*", (req, res, next) => {
