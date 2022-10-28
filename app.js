@@ -6,7 +6,7 @@ const methodOverride = require('method-override')
 
 const ejsMate = require('ejs-mate')
 
-const {campgroundSchema} = require('./schemas')
+const {campgroundSchema, reviewSchema} = require('./schemas')
 
 const Campground = require("./models/campground")
 const Review = require('./models/review')
@@ -36,6 +36,17 @@ const validateCampground = (req, res, next) => {
     if (error) {
         const msg = error.details.map(el => el.message).join(',')
         throw new expressError(msg, 400)
+    }
+    else {
+        next()
+    }
+}
+
+const validateReview = (req,res,next) => {
+    const {error} = reviewSchema.validate(req.body)
+    if (error) {
+        const msg = error.details.map(el => el.message).join(",")
+        throw new expressError(msg,400)
     }
     else {
         next()
@@ -83,7 +94,7 @@ app.delete('/campgrounds/:id', wrapAsync(async (req,res) =>{
     res.redirect('/campgrounds')
 }))
 
-app.post('/campgrounds/:id/reviews', wrapAsync(async (req,res) =>{
+app.post('/campgrounds/:id/reviews', validateReview, wrapAsync(async (req,res) =>{
     const campground = await Campground.findById(req.params.id)
     console.log(campground)
     const review = new Review(req.body.review)
