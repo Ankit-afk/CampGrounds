@@ -15,6 +15,8 @@ const expressError = require('./utils/expressError')
 const mongoose = require('mongoose');
 const { appendFileSync } = require('fs')
 
+const campground = require('./routes/campgrounds')
+
 mongoose.connect('mongodb://localhost:27017/campGround', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log("MONGO CONNECTION OPEN!!!")
@@ -29,18 +31,6 @@ app.set("view engine", "ejs")
 app.set("views", path.join(__dirname,"views"))
 app.use(express.urlencoded({extended:true}))
 app.use(methodOverride('__method'))
-
-const validateCampground = (req, res, next) => {
-    const {error} = campgroundSchema.validate(req.body)
-    // console.log(req.body, error);
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',')
-        throw new expressError(msg, 400)
-    }
-    else {
-        next()
-    }
-}
 
 const validateReview = (req,res,next) => {
     const {error} = reviewSchema.validate(req.body)
@@ -57,42 +47,7 @@ app.get('/', (req, res) => {
     res.render("home")
 })
 
-app.get('/campgrounds', wrapAsync(async (req, res) => {
-    const campgrounds = await Campground.find({})
-    res.render('./campgrounds/index',{campgrounds})
-}))
-
-app.get('/campgrounds/new', (req, res) => {
-    res.render('./campgrounds/new')
-})
-
-app.post('/campgrounds', validateCampground , wrapAsync(async (req, res, next) => {
-
-        const campground = new Campground(req.body.campground)
-        await campground.save()
-        res.redirect(`/campgrounds/${campground._id}`)
-}))
-
-app.get('/campgrounds/:id', wrapAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id).populate('reviews')
-    // console.log(campground)
-    res.render("./campgrounds/show",{campground})
-}))
-
-app.get('/campgrounds/:id/edit', wrapAsync(async (req,res) => {
-    const campground = await Campground.findById(req.params.id)
-    res.render('./campgrounds/edit',{campground})
-}))
-
-app.put('/campgrounds/:id', validateCampground, wrapAsync(async (req, res) =>{
-    const campground = await Campground.findByIdAndUpdate(req.params.id, {...req.body.campground})
-    res.redirect(`/campgrounds/${campground._id}`)
-}))
-
-app.delete('/campgrounds/:id', wrapAsync(async (req,res) =>{
-    const campground = await Campground.findByIdAndDelete(req.params.id)
-    res.redirect('/campgrounds')
-}))
+app.use('/campgrounds',campground)
 
 app.post('/campgrounds/:id/reviews', validateReview, wrapAsync(async (req,res) =>{
     const campground = await Campground.findById(req.params.id)
